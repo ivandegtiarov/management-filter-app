@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers, setFilter } from './features/users/usersSlice';
-import { RootState } from './store';
+import { fetchUsers, setFilter, FilterableFields } from './features/users/usersSlice';
+import { RootState } from './store/store';
+import { AppDispatch } from './store/store'; 
 
 const App: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { filteredUsers, filters, loading, error } = useSelector((state: RootState) => state.users);
 
   useEffect(() => {
@@ -12,7 +13,7 @@ const App: React.FC = () => {
   }, [dispatch]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setFilter({ field: e.target.name, value: e.target.value }));
+    dispatch(setFilter({ field: e.target.name as FilterableFields, value: e.target.value }));
   };
 
   return (

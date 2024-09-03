@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
 
 interface User {
   id: number;
@@ -14,13 +14,10 @@ interface UsersState {
   filteredUsers: User[];
   loading: boolean;
   error: string | null;
-  filters: {
-    name: string;
-    username: string;
-    email: string;
-    phone: string;
-  };
+  filters: Record<FilterableFields, string>;
 }
+
+export type FilterableFields = "name" | "username" | "email" | "phone";
 
 const initialState: UsersState = {
   users: [],
@@ -28,29 +25,39 @@ const initialState: UsersState = {
   loading: false,
   error: null,
   filters: {
-    name: '',
-    username: '',
-    email: '',
-    phone: '',
+    name: "",
+    username: "",
+    email: "",
+    phone: "",
   },
 };
 
-export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
-  const response = await axios.get<User[]>('https://jsonplaceholder.typicode.com/users');
+export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
+  const response = await axios.get<User[]>(
+    "https://jsonplaceholder.typicode.com/users"
+  );
   return response.data;
 });
 
 const usersSlice = createSlice({
-  name: 'users',
+  name: "users",
   initialState,
   reducers: {
-    setFilter: (state, action: PayloadAction<{ field: string; value: string }>) => {
+    setFilter: (
+      state,
+      action: PayloadAction<{ field: FilterableFields; value: string }>
+    ) => {
       state.filters[action.payload.field] = action.payload.value;
       state.filteredUsers = state.users.filter((user) =>
-        Object.keys(state.filters).every(
-          (key) => user[key as keyof User].toLowerCase().includes(state.filters[key as keyof UsersState['filters']].toLowerCase())
+        Object.keys(state.filters).every((key) =>
+          user[key as keyof User]
+            ?.toString()
+            .toLowerCase()
+            .includes(
+              state.filters[key as keyof UsersState["filters"]].toLowerCase()
+            )
         )
-      ); 
+      );
     },
   },
   extraReducers: (builder) => {
@@ -66,7 +73,7 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Something went wrong';
+        state.error = action.error.message || "Something went wrong";
       });
   },
 });
